@@ -32,11 +32,13 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -82,8 +84,8 @@ fun DashboardScreen(
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            // --- Tarjeta resumen total ---
-            TotalCard(total = dashboard.total)
+            // --- Tarjeta resumen total con barra de progreso integrada ---
+            TotalCard(total = dashboard.total, entregadas = dashboard.entregadas)
 
             // --- Conteo por estado ---
             Text(
@@ -145,7 +147,9 @@ fun DashboardScreen(
 }
 
 @Composable
-private fun TotalCard(total: Int) {
+private fun TotalCard(total: Int, entregadas: Int) {
+    val progreso = if (total > 0) entregadas.toFloat() / total.toFloat() else 0f
+
     Card(
         modifier = Modifier.fillMaxWidth(),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
@@ -154,38 +158,72 @@ private fun TotalCard(total: Int) {
         ),
         shape = RoundedCornerShape(16.dp)
     ) {
-        Row(
+        Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(20.dp),
-            verticalAlignment = Alignment.CenterVertically
+                .padding(20.dp)
         ) {
-            Box(
-                modifier = Modifier
-                    .size(56.dp)
-                    .background(Color.White.copy(alpha = 0.2f), CircleShape),
-                contentAlignment = Alignment.Center
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Icon(
-                    imageVector = Icons.Filled.Assignment,
-                    contentDescription = null,
-                    tint = Color.White
-                )
+                Box(
+                    modifier = Modifier
+                        .size(56.dp)
+                        .background(Color.White.copy(alpha = 0.2f), CircleShape),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        imageVector = Icons.Filled.Assignment,
+                        contentDescription = null,
+                        tint = Color.White
+                    )
+                }
+                Spacer(modifier = Modifier.size(16.dp))
+                Column {
+                    Text(
+                        text = "Total de tareas",
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = Color.White.copy(alpha = 0.85f)
+                    )
+                    Text(
+                        text = total.toString(),
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.Bold,
+                        color = Color.White
+                    )
+                }
             }
-            Spacer(modifier = Modifier.size(16.dp))
-            Column {
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
                 Text(
-                    text = "Total de tareas",
-                    style = MaterialTheme.typography.bodyLarge,
+                    text = "Avance global",
+                    style = MaterialTheme.typography.labelSmall,
                     color = Color.White.copy(alpha = 0.85f)
                 )
                 Text(
-                    text = total.toString(),
-                    style = MaterialTheme.typography.titleLarge,
+                    text = "${(progreso * 100).toInt()}%",
+                    style = MaterialTheme.typography.labelSmall,
                     fontWeight = FontWeight.Bold,
                     color = Color.White
                 )
             }
+            LinearProgressIndicator(
+                progress = { progreso },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 8.dp)
+                    .height(8.dp),
+                color = EstadoEntregada,
+                trackColor = Color.White.copy(alpha = 0.2f),
+                strokeCap = StrokeCap.Round
+            )
         }
     }
 }

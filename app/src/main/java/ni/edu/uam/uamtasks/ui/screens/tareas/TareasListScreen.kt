@@ -1,6 +1,8 @@
 package ni.edu.uam.uamtasks.ui.screens.tareas
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -16,6 +18,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Assignment
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FloatingActionButton
@@ -25,9 +28,14 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.SwipeToDismissBox
+import androidx.compose.material3.SwipeToDismissBoxValue
+import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -152,7 +160,7 @@ fun TareasListScreen(
 
             Spacer(modifier = Modifier.width(4.dp))
 
-            // ----- Lista -----
+            // ----- Lista con soporte de Swipe to Delete -----
             if (tareas.isEmpty()) {
                 EmptyState(
                     icon = Icons.Filled.Assignment,
@@ -167,10 +175,47 @@ fun TareasListScreen(
                     verticalArrangement = Arrangement.spacedBy(10.dp)
                 ) {
                     items(tareas, key = { it.tarea.id }) { item ->
-                        TareaCard(
-                            item = item,
-                            onClick = { onTareaClick(item.tarea.id) }
+                        val dismissState = rememberSwipeToDismissBoxState(
+                            confirmValueChange = { dismissValue ->
+                                if (dismissValue == SwipeToDismissBoxValue.EndToStart) {
+                                    tareaViewModel.eliminar(item.tarea)
+                                    true
+                                } else {
+                                    false
+                                }
+                            }
                         )
+
+                        SwipeToDismissBox(
+                            state = dismissState,
+                            enableDismissFromStartToEnd = false,
+                            backgroundContent = {
+                                val color = if (dismissState.targetValue == SwipeToDismissBoxValue.EndToStart) {
+                                    MaterialTheme.colorScheme.error
+                                } else {
+                                    MaterialTheme.colorScheme.error.copy(alpha = 0.5f)
+                                }
+
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxSize()
+                                        .background(color, shape = MaterialTheme.shapes.medium)
+                                        .padding(horizontal = 20.dp),
+                                    contentAlignment = Alignment.CenterEnd
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Filled.Delete,
+                                        contentDescription = "Eliminar tarea",
+                                        tint = Color.White
+                                    )
+                                }
+                            }
+                        ) {
+                            TareaCard(
+                                item = item,
+                                onClick = { onTareaClick(item.tarea.id) }
+                            )
+                        }
                     }
                 }
             }
