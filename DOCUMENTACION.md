@@ -2,8 +2,8 @@
 
 **Universidad Americana (UAM)**
 **Curso:** Desarrollo de Aplicaciones Móviles
-**Equipo:** _[Nombres del equipo]_
-**Fecha:** _[Fecha de entrega]_
+**Equipo:** 5
+**Fecha:** _[20 de Mayo]_
 
 ---
 
