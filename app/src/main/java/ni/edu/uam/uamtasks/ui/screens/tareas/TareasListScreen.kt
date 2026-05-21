@@ -27,6 +27,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -49,6 +50,10 @@ fun TareasListScreen(
     val filtro by tareaViewModel.filtro.collectAsStateWithLifecycle()
     val materias by materiaViewModel.materias.collectAsStateWithLifecycle()
 
+    // Memoizar callbacks
+    val handleTareaClick = remember { onTareaClick }
+    val handleAgregarTarea = remember { onAgregarTarea }
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -61,7 +66,7 @@ fun TareasListScreen(
         },
         floatingActionButton = {
             FloatingActionButton(
-                onClick = onAgregarTarea,
+                onClick = handleAgregarTarea,
                 containerColor = MaterialTheme.colorScheme.primary
             ) {
                 Icon(
@@ -169,7 +174,7 @@ fun TareasListScreen(
                     items(tareas, key = { it.tarea.id }) { item ->
                         TareaCard(
                             item = item,
-                            onClick = { onTareaClick(item.tarea.id) }
+                            onClick = { handleTareaClick(item.tarea.id) }
                         )
                     }
                 }

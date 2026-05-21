@@ -5,6 +5,7 @@ import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.navigation.NavController
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import ni.edu.uam.uamtasks.ui.navigation.Screen
@@ -14,8 +15,11 @@ fun BottomNavBar(
     navController: NavController,
     rutaActual: String?
 ) {
+    // Memoizar la lista de tabs para evitar recalcularla
+    val tabs = remember { Screen.tabs }
+
     NavigationBar {
-        Screen.tabs.forEach { tab ->
+        tabs.forEach { tab ->
             NavigationBarItem(
                 selected = rutaActual == tab.route,
                 onClick = {

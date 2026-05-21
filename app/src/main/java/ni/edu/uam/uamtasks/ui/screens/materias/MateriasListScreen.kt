@@ -43,6 +43,10 @@ fun MateriasListScreen(
     val materias by materiaViewModel.materias.collectAsStateWithLifecycle()
     var materiaAEliminar by remember { mutableStateOf<Materia?>(null) }
 
+    // Memoizar callbacks
+    val handleAgregarMateria = remember { onAgregarMateria }
+    val handleEditarMateria = remember { onEditarMateria }
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -55,7 +59,7 @@ fun MateriasListScreen(
         },
         floatingActionButton = {
             FloatingActionButton(
-                onClick = onAgregarMateria,
+                onClick = handleAgregarMateria,
                 containerColor = MaterialTheme.colorScheme.primary
             ) {
                 Icon(
@@ -88,7 +92,7 @@ fun MateriasListScreen(
                 items(materias, key = { it.id }) { materia ->
                     MateriaCard(
                         materia = materia,
-                        onEditar = { onEditarMateria(materia.id) },
+                        onEditar = { handleEditarMateria(materia.id) },
                         onEliminar = { materiaAEliminar = materia }
                     )
                 }

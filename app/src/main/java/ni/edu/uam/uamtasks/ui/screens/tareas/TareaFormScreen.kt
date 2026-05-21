@@ -55,7 +55,8 @@ import ni.edu.uam.uamtasks.data.model.Prioridad
 import ni.edu.uam.uamtasks.data.model.Tarea
 import ni.edu.uam.uamtasks.viewmodel.MateriaViewModel
 import ni.edu.uam.uamtasks.viewmodel.TareaViewModel
-import java.text.SimpleDateFormat
+import ni.edu.uam.uamtasks.ui.utils.DateFormatterUtil
+import ni.edu.uam.uamtasks.ui.utils.FormatStyle
 import java.util.Date
 import java.util.Locale
 
@@ -381,7 +382,6 @@ private fun FechaSelectorCard(
     fechaMs: Long,
     onClick: () -> Unit
 ) {
-    val formato = remember { SimpleDateFormat("EEEE d 'de' MMMM, yyyy", Locale("es", "NI")) }
 
     Card(
         modifier = Modifier
@@ -411,7 +411,7 @@ private fun FechaSelectorCard(
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
                 Text(
-                    text = formato.format(Date(fechaMs))
+                    text = DateFormatterUtil.format(fechaMs, FormatStyle.LONG)
                         .replaceFirstChar { it.uppercase(Locale("es", "NI")) },
                     style = MaterialTheme.typography.bodyLarge
                 )

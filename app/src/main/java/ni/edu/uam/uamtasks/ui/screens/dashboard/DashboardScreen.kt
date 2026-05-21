@@ -34,6 +34,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -53,6 +54,10 @@ fun DashboardScreen(
     onAgregarTarea: () -> Unit
 ) {
     val dashboard by tareaViewModel.dashboard.collectAsStateWithLifecycle()
+
+    // Memoizar callbacks para evitar crear lambdas nuevas en cada composición
+    val handleIrATareas = remember { onIrATareas }
+    val handleAgregarTarea = remember { onAgregarTarea }
 
     Scaffold(
         topBar = {
@@ -124,7 +129,7 @@ fun DashboardScreen(
 
             // --- Acciones ---
             Button(
-                onClick = onAgregarTarea,
+                onClick = handleAgregarTarea,
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Icon(Icons.Filled.Add, contentDescription = null)
@@ -133,7 +138,7 @@ fun DashboardScreen(
             }
 
             OutlinedButton(
-                onClick = onIrATareas,
+                onClick = handleIrATareas,
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Icon(Icons.Filled.Assignment, contentDescription = null)

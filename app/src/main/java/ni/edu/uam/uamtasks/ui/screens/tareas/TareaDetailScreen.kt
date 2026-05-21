@@ -51,8 +51,9 @@ import ni.edu.uam.uamtasks.data.model.TareaConMateria
 import ni.edu.uam.uamtasks.ui.components.EstadoChip
 import ni.edu.uam.uamtasks.ui.components.PrioridadChip
 import ni.edu.uam.uamtasks.ui.components.parsearColor
+import ni.edu.uam.uamtasks.ui.utils.DateFormatterUtil
+import ni.edu.uam.uamtasks.ui.utils.FormatStyle
 import ni.edu.uam.uamtasks.viewmodel.TareaViewModel
-import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
@@ -162,8 +163,7 @@ private fun DetalleContenido(
     onEditar: () -> Unit,
     onSolicitarEliminar: () -> Unit
 ) {
-    val formato = remember { SimpleDateFormat("EEEE d 'de' MMMM, yyyy", Locale("es", "NI")) }
-    val colorMateria = parsearColor(item.materia.colorHex)
+    val colorMateria = remember(item.materia.colorHex) { parsearColor(item.materia.colorHex) }
 
     Column(
         modifier = modifier.fillMaxSize(),
@@ -240,7 +240,7 @@ private fun DetalleContenido(
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
                 Text(
-                    text = formato.format(Date(item.tarea.fechaEntrega))
+                    text = DateFormatterUtil.format(item.tarea.fechaEntrega, FormatStyle.LONG)
                         .replaceFirstChar { it.uppercase(Locale("es", "NI")) },
                     style = MaterialTheme.typography.bodyLarge
                 )

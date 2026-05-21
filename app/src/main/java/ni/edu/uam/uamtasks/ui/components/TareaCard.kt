@@ -29,9 +29,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import ni.edu.uam.uamtasks.data.model.TareaConMateria
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
+import ni.edu.uam.uamtasks.ui.utils.DateFormatterUtil
+
+// Cache global para colores parseados
+private val colorCache = mutableMapOf<String, Color>()
 
 @Composable
 fun TareaCard(
@@ -39,8 +40,9 @@ fun TareaCard(
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val formatoFecha = remember { SimpleDateFormat("dd/MM/yyyy", Locale("es", "NI")) }
-    val colorMateria = parsearColor(item.materia.colorHex)
+    val colorMateria = remember(item.materia.colorHex) {
+        parsearColor(item.materia.colorHex)
+    }
 
     Card(
         modifier = modifier
@@ -110,7 +112,7 @@ fun TareaCard(
                     )
                     Spacer(modifier = Modifier.width(4.dp))
                     Text(
-                        text = "Entrega: ${formatoFecha.format(Date(item.tarea.fechaEntrega))}",
+                        text = "Entrega: ${DateFormatterUtil.format(item.tarea.fechaEntrega)}",
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -120,6 +122,15 @@ fun TareaCard(
     }
 }
 
-internal fun parsearColor(hex: String): Color =
-    runCatching { Color(android.graphics.Color.parseColor(hex)) }
+internal fun parsearColor(hex: String): Color {
+    // Primero buscar en cache
+    colorCache[hex]?.let { return it }
+
+    // Si no está en cache, parsear y guardar
+    val color = runCatching { Color(android.graphics.Color.parseColor(hex)) }
         .getOrDefault(Color(0xFF1A3A5C))
+
+    colorCache[hex] = color
+    return color
+}
+
