@@ -174,7 +174,8 @@ fun TareasListScreen(
                     items(tareas, key = { it.tarea.id }) { item ->
                         TareaCard(
                             item = item,
-                            onClick = { handleTareaClick(item.tarea.id) }
+                            onClick = { handleTareaClick(item.tarea.id) },
+                            onMarcarEntregada = { tareaViewModel.marcarComoEntregada(item.tarea) }
                         )
                     }
                 }

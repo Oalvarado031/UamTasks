@@ -15,11 +15,13 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CalendarToday
+import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -38,6 +40,7 @@ private val colorCache = mutableMapOf<String, Color>()
 fun TareaCard(
     item: TareaConMateria,
     onClick: () -> Unit,
+    onMarcarEntregada: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val colorMateria = remember(item.materia.colorHex) {
@@ -116,6 +119,31 @@ fun TareaCard(
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
+                }
+            }
+
+            // Botón Entregado
+            if (item.tarea.estado != ni.edu.uam.uamtasks.data.model.EstadoTarea.ENTREGADA) {
+                Column(
+                    modifier = Modifier.align(Alignment.CenterVertically),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    TextButton(
+                        onClick = onMarcarEntregada,
+                        modifier = Modifier.padding(start = 4.dp)
+                    ) {
+                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                            Icon(
+                                imageVector = Icons.Filled.CheckCircle,
+                                contentDescription = null,
+                                modifier = Modifier.size(20.dp)
+                            )
+                            Text(
+                                text = "Entregado",
+                                style = MaterialTheme.typography.labelSmall
+                            )
+                        }
+                    }
                 }
             }
         }

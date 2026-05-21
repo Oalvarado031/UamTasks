@@ -11,6 +11,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavType
 import ni.edu.uam.uamtasks.ui.components.BottomNavBar
 import ni.edu.uam.uamtasks.ui.screens.dashboard.DashboardScreen
@@ -60,7 +61,11 @@ fun AppNavigation() {
                     tareaViewModel = tareaViewModel,
                     onIrATareas = {
                         navController.navigate(Screen.Tab.Tareas.route) {
+                            popUpTo(navController.graph.findStartDestination().id) {
+                                saveState = true
+                            }
                             launchSingleTop = true
+                            restoreState = true
                         }
                     },
                     onAgregarTarea = { navController.navigate(Screen.NuevaTarea.route) }

@@ -17,6 +17,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.CalendarToday
+import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.School
@@ -126,7 +127,11 @@ fun TareaDetailScreen(
                     .padding(16.dp),
                 item = tareaConMateria,
                 onEditar = onEditar,
-                onSolicitarEliminar = { mostrarDialogoEliminar = true }
+                onSolicitarEliminar = { mostrarDialogoEliminar = true },
+                onMarcarEntregada = {
+                    tareaViewModel.marcarComoEntregada(tareaConMateria.tarea)
+                    onVolver() // Volver a la lista después de marcar como entregada
+                }
             )
         }
     }
@@ -161,7 +166,8 @@ private fun DetalleContenido(
     modifier: Modifier = Modifier,
     item: TareaConMateria,
     onEditar: () -> Unit,
-    onSolicitarEliminar: () -> Unit
+    onSolicitarEliminar: () -> Unit,
+    onMarcarEntregada: () -> Unit
 ) {
     val colorMateria = remember(item.materia.colorHex) { parsearColor(item.materia.colorHex) }
 
@@ -263,6 +269,21 @@ private fun DetalleContenido(
         Spacer(modifier = Modifier.height(16.dp))
 
         // Acciones
+        if (item.tarea.estado != ni.edu.uam.uamtasks.data.model.EstadoTarea.ENTREGADA) {
+            Button(
+                onClick = onMarcarEntregada,
+                modifier = Modifier.fillMaxWidth(),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.tertiary,
+                    contentColor = MaterialTheme.colorScheme.onTertiary
+                )
+            ) {
+                Icon(Icons.Filled.CheckCircle, contentDescription = null)
+                Spacer(modifier = Modifier.size(8.dp))
+                Text("Marcar como entregada")
+            }
+        }
+
         Button(
             onClick = onEditar,
             modifier = Modifier.fillMaxWidth()

@@ -121,6 +121,12 @@ class TareaViewModel(
         }
     }
 
+    fun marcarComoEntregada(tarea: Tarea) {
+        viewModelScope.launch {
+            repository.actualizar(tarea.copy(estado = EstadoTarea.ENTREGADA))
+        }
+    }
+
     fun eliminar(tarea: Tarea) {
         viewModelScope.launch {
             repository.eliminar(tarea)
