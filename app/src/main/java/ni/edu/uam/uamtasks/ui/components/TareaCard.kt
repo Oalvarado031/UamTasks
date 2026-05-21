@@ -1,7 +1,6 @@
 package ni.edu.uam.uamtasks.ui.components
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -13,6 +12,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CalendarToday
 import androidx.compose.material3.Card
@@ -40,12 +40,16 @@ fun TareaCard(
     modifier: Modifier = Modifier
 ) {
     val formatoFecha = remember { SimpleDateFormat("dd/MM/yyyy", Locale("es", "NI")) }
-    val colorMateria = parsearColor(item.materia.colorHex)
 
+    // CAMBIO 1: Uso de 'remember' asociado al valor del colorHex
+    val colorMateria = remember(item.materia.colorHex) {
+        parsearColor(item.materia.colorHex)
+    }
+
+    // CAMBIO 2: Uso del parámetro 'onClick' nativo de Card (Material 3)
     Card(
-        modifier = modifier
-            .fillMaxWidth()
-            .clickable { onClick() },
+        onClick = onClick,
+        modifier = modifier.fillMaxWidth(),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surface
@@ -57,7 +61,8 @@ fun TareaCard(
                 modifier = Modifier
                     .width(6.dp)
                     .height(64.dp)
-                    .background(colorMateria, shape = androidx.compose.foundation.shape.RoundedCornerShape(3.dp))
+                    // CAMBIO 3: Importación directa de RoundedCornerShape
+                    .background(colorMateria, shape = RoundedCornerShape(3.dp))
             )
 
             Spacer(modifier = Modifier.width(12.dp))
@@ -104,13 +109,19 @@ fun TareaCard(
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Icon(
                         imageVector = Icons.Filled.CalendarToday,
-                        contentDescription = null,
+                        contentDescription = "Fecha de entrega", // CAMBIO 4: Descripción de accesibilidad
                         modifier = Modifier.size(14.dp),
                         tint = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                     Spacer(modifier = Modifier.width(4.dp))
+
+                    // CAMBIO 5: Se memoriza el string final de la fecha
+                    val fechaFormateada = remember(item.tarea.fechaEntrega) {
+                        formatoFecha.format(Date(item.tarea.fechaEntrega))
+                    }
+
                     Text(
-                        text = "Entrega: ${formatoFecha.format(Date(item.tarea.fechaEntrega))}",
+                        text = "Entrega: $fechaFormateada",
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
