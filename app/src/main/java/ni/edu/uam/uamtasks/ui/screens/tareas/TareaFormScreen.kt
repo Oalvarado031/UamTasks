@@ -2,7 +2,6 @@ package ni.edu.uam.uamtasks.ui.screens.tareas
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -26,10 +25,10 @@ import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.ExposedDropdownMenuAnchorType
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.MenuAnchorType
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
@@ -92,7 +91,7 @@ fun TareaFormScreen(
     // Precarga al editar
     LaunchedEffect(tareaId) {
         if (esEdicion) {
-            val item = tareaViewModel.obtenerPorId(tareaId!!)
+            val item = tareaViewModel.obtenerPorId(tareaId)
             if (item != null) {
                 titulo = item.tarea.titulo
                 descripcion = item.tarea.descripcion
@@ -208,10 +207,10 @@ fun TareaFormScreen(
                         if (!it) errorMateria = "Selecciona una materia"
                     }
                     if (tituloValido && materiaValida) {
-                        if (esEdicion) {
+                        if (esEdicion && tareaId != null) {
                             tareaViewModel.actualizar(
                                 Tarea(
-                                    id = tareaId!!,
+                                    id = tareaId,
                                     titulo = titulo,
                                     descripcion = descripcion,
                                     fechaEntrega = fechaEntrega,
@@ -220,7 +219,7 @@ fun TareaFormScreen(
                                     materiaId = materiaSeleccionada!!.id
                                 )
                             )
-                        } else {
+                        } else if (materiaSeleccionada != null) {
                             tareaViewModel.agregar(
                                 titulo = titulo,
                                 descripcion = descripcion,
@@ -304,11 +303,12 @@ private fun MateriaDropdown(
             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandido) },
             modifier = Modifier
                 .fillMaxWidth()
-                .menuAnchor(MenuAnchorType.PrimaryNotEditable, true)
+                .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable, true)
         )
         DropdownMenu(
             expanded = expandido,
-            onDismissRequest = { expandido = false }
+            onDismissRequest = { expandido = false },
+            modifier = Modifier.exposedDropdownSize()
         ) {
             if (materias.isEmpty()) {
                 DropdownMenuItem(
@@ -353,11 +353,12 @@ private fun <T> EnumDropdown(
             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandido) },
             modifier = Modifier
                 .fillMaxWidth()
-                .menuAnchor(MenuAnchorType.PrimaryNotEditable, true)
+                .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable, true)
         )
         DropdownMenu(
             expanded = expandido,
-            onDismissRequest = { expandido = false }
+            onDismissRequest = { expandido = false },
+            modifier = Modifier.exposedDropdownSize()
         ) {
             opciones.forEach { op ->
                 DropdownMenuItem(
@@ -381,7 +382,7 @@ private fun FechaSelectorCard(
     fechaMs: Long,
     onClick: () -> Unit
 ) {
-    val formato = remember { SimpleDateFormat("EEEE d 'de' MMMM, yyyy", Locale("es", "NI")) }
+    val formato = remember { SimpleDateFormat("EEEE d 'de' MMMM, yyyy", Locale.forLanguageTag("es-NI")) }
 
     Card(
         modifier = Modifier
@@ -412,7 +413,7 @@ private fun FechaSelectorCard(
                 )
                 Text(
                     text = formato.format(Date(fechaMs))
-                        .replaceFirstChar { it.uppercase(Locale("es", "NI")) },
+                        .replaceFirstChar { it.uppercase(Locale.forLanguageTag("es-NI")) },
                     style = MaterialTheme.typography.bodyLarge
                 )
             }
