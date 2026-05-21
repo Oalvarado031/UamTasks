@@ -1,9 +1,6 @@
 package ni.edu.uam.uamtasks.ui.screens.tareas
 
-<<<<<<< HEAD
-=======
 import androidx.compose.foundation.Image
->>>>>>> diedereich
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -21,8 +18,8 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Assignment
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Assignment
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -30,31 +27,20 @@ import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-<<<<<<< HEAD
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.SwipeToDismissBox
 import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-=======
 import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.material3.Surface
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
->>>>>>> diedereich
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -78,8 +64,8 @@ fun TareasListScreen(
     val materias by materiaViewModel.materias.collectAsStateWithLifecycle()
 
     // Memoizar callbacks
-    val handleTareaClick = remember { onTareaClick }
-    val handleAgregarTarea = remember { onAgregarTarea }
+    val currentOnTareaClick by rememberUpdatedState(onTareaClick)
+    val currentOnAgregarTarea by rememberUpdatedState(onAgregarTarea)
 
     Scaffold(
         topBar = {
@@ -110,7 +96,7 @@ fun TareasListScreen(
         },
         floatingActionButton = {
             FloatingActionButton(
-                onClick = handleAgregarTarea,
+                onClick = { currentOnAgregarTarea() },
                 containerColor = MaterialTheme.colorScheme.primary
             ) {
                 Icon(
@@ -204,7 +190,7 @@ fun TareasListScreen(
             // ----- Lista con soporte de Swipe to Delete -----
             if (tareas.isEmpty()) {
                 EmptyState(
-                    icon = Icons.Filled.Assignment,
+                    icon = Icons.AutoMirrored.Filled.Assignment,
                     titulo = "No hay tareas",
                     descripcion = "Agrega tu primera tarea con el botón +"
                 )
@@ -216,7 +202,6 @@ fun TareasListScreen(
                     verticalArrangement = Arrangement.spacedBy(10.dp)
                 ) {
                     items(tareas, key = { it.tarea.id }) { item ->
-<<<<<<< HEAD
                         val dismissState = rememberSwipeToDismissBoxState(
                             confirmValueChange = { dismissValue ->
                                 if (dismissValue == SwipeToDismissBoxValue.EndToStart) {
@@ -226,12 +211,6 @@ fun TareasListScreen(
                                     false
                                 }
                             }
-=======
-                        TareaCard(
-                            item = item,
-                            onClick = { handleTareaClick(item.tarea.id) },
-                            onMarcarEntregada = { tareaViewModel.marcarComoEntregada(item.tarea) }
->>>>>>> diedereich
                         )
 
                         SwipeToDismissBox(
@@ -261,7 +240,8 @@ fun TareasListScreen(
                         ) {
                             TareaCard(
                                 item = item,
-                                onClick = { onTareaClick(item.tarea.id) }
+                                onClick = { currentOnTareaClick(item.tarea.id) },
+                                onMarcarEntregada = { tareaViewModel.marcarComoEntregada(item.tarea) }
                             )
                         }
                     }
