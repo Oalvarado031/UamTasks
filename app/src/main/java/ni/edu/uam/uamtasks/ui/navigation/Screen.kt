@@ -1,7 +1,7 @@
 package ni.edu.uam.uamtasks.ui.navigation
 
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Assignment
+import androidx.compose.material.icons.automirrored.filled.Assignment
 import androidx.compose.material.icons.filled.Dashboard
 import androidx.compose.material.icons.filled.School
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -14,7 +14,7 @@ sealed class Screen(val route: String) {
     // --- Pestañas principales (con icono en Bottom Bar) ---
     sealed class Tab(route: String, val label: String, val icon: ImageVector) : Screen(route) {
         data object Dashboard : Tab("dashboard", "Inicio", Icons.Filled.Dashboard)
-        data object Tareas : Tab("tareas", "Tareas", Icons.Filled.Assignment)
+        data object Tareas : Tab("tareas", "Tareas", Icons.AutoMirrored.Filled.Assignment)
         data object Materias : Tab("materias", "Materias", Icons.Filled.School)
     }
 

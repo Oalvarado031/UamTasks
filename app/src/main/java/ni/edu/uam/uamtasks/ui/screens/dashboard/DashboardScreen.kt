@@ -1,5 +1,6 @@
 package ni.edu.uam.uamtasks.ui.screens.dashboard
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -11,13 +12,14 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Assignment
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Assignment
 import androidx.compose.material.icons.filled.AssignmentTurnedIn
 import androidx.compose.material.icons.filled.HourglassEmpty
 import androidx.compose.material.icons.filled.PendingActions
@@ -25,23 +27,25 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import ni.edu.uam.uamtasks.R
 import ni.edu.uam.uamtasks.ui.theme.EstadoEnProgreso
 import ni.edu.uam.uamtasks.ui.theme.EstadoEntregada
 import ni.edu.uam.uamtasks.ui.theme.EstadoPendiente
@@ -56,24 +60,43 @@ fun DashboardScreen(
 ) {
     val dashboard by tareaViewModel.dashboard.collectAsStateWithLifecycle()
 
+    // Memoizar callbacks para evitar crear lambdas nuevas en cada composición
+    val currentOnIrATareas by rememberUpdatedState(onIrATareas)
+    val currentOnAgregarTarea by rememberUpdatedState(onAgregarTarea)
+
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = {
+            Surface(
+                color = MaterialTheme.colorScheme.primary,
+                contentColor = MaterialTheme.colorScheme.onPrimary,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Row(
+                    modifier = Modifier
+                        .statusBarsPadding()
+                        .padding(horizontal = 16.dp, vertical = 6.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Image(
+                        painter = painterResource(id = R.drawable.uam_logo),
+                        contentDescription = null,
+                        modifier = Modifier.size(60.dp)
+                    )
+                    Spacer(modifier = Modifier.width(12.dp))
                     Column {
-                        Text("UAM Tasks", fontWeight = FontWeight.Bold)
                         Text(
-                            "Tu gestor académico",
+                            text = "UAM Tasks",
+                            style = MaterialTheme.typography.titleLarge,
+                            fontWeight = FontWeight.Bold
+                        )
+                        Text(
+                            text = "Tu gestor académico",
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.85f)
                         )
                     }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primary,
-                    titleContentColor = MaterialTheme.colorScheme.onPrimary
-                )
-            )
+                }
+            }
         }
     ) { padding ->
         Column(
@@ -126,7 +149,7 @@ fun DashboardScreen(
 
             // --- Acciones ---
             Button(
-                onClick = onAgregarTarea,
+                onClick = { currentOnAgregarTarea() },
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Icon(Icons.Filled.Add, contentDescription = null)
@@ -135,10 +158,10 @@ fun DashboardScreen(
             }
 
             OutlinedButton(
-                onClick = onIrATareas,
+                onClick = { currentOnIrATareas() },
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Icon(Icons.Filled.Assignment, contentDescription = null)
+                Icon(Icons.AutoMirrored.Filled.Assignment, contentDescription = null)
                 Spacer(modifier = Modifier.size(8.dp))
                 Text("Ver todas las tareas")
             }
@@ -174,7 +197,7 @@ private fun TotalCard(total: Int, entregadas: Int) {
                     contentAlignment = Alignment.Center
                 ) {
                     Icon(
-                        imageVector = Icons.Filled.Assignment,
+                        imageVector = Icons.AutoMirrored.Filled.Assignment,
                         contentDescription = null,
                         tint = Color.White
                     )
@@ -221,8 +244,7 @@ private fun TotalCard(total: Int, entregadas: Int) {
                     .padding(top = 8.dp)
                     .height(8.dp),
                 color = EstadoEntregada,
-                trackColor = Color.White.copy(alpha = 0.2f),
-                strokeCap = StrokeCap.Round
+                trackColor = Color.White.copy(alpha = 0.2f)
             )
         }
     }

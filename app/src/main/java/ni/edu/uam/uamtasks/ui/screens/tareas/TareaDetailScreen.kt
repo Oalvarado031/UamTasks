@@ -17,6 +17,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.CalendarToday
+import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.School
@@ -35,8 +36,9 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.material3.Surface
+import androidx.compose.ui.unit.sp
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -51,8 +53,9 @@ import ni.edu.uam.uamtasks.data.model.TareaConMateria
 import ni.edu.uam.uamtasks.ui.components.EstadoChip
 import ni.edu.uam.uamtasks.ui.components.PrioridadChip
 import ni.edu.uam.uamtasks.ui.components.parsearColor
+import ni.edu.uam.uamtasks.ui.utils.DateFormatterUtil
+import ni.edu.uam.uamtasks.ui.utils.FormatStyle
 import ni.edu.uam.uamtasks.viewmodel.TareaViewModel
-import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
@@ -74,17 +77,29 @@ fun TareaDetailScreen(
 
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = { Text("Detalle de tarea", fontWeight = FontWeight.Bold) },
-                navigationIcon = {
+            Surface(
+                color = MaterialTheme.colorScheme.primary,
+                contentColor = MaterialTheme.colorScheme.onPrimary,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Row(
+                    modifier = Modifier
+                        .statusBarsPadding()
+                        .padding(horizontal = 4.dp, vertical = 4.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
                     IconButton(onClick = onVolver) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = "Volver"
                         )
                     }
-                },
-                actions = {
+                    Text(
+                        text = "Detalle de tarea",
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.weight(1f)
+                    )
                     IconButton(onClick = onEditar) {
                         Icon(
                             imageVector = Icons.Filled.Edit,
@@ -97,14 +112,8 @@ fun TareaDetailScreen(
                             contentDescription = "Eliminar"
                         )
                     }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primary,
-                    titleContentColor = MaterialTheme.colorScheme.onPrimary,
-                    navigationIconContentColor = MaterialTheme.colorScheme.onPrimary,
-                    actionIconContentColor = MaterialTheme.colorScheme.onPrimary
-                )
-            )
+                }
+            }
         }
     ) { padding ->
         val tareaConMateria = item
@@ -125,7 +134,11 @@ fun TareaDetailScreen(
                     .padding(16.dp),
                 item = tareaConMateria,
                 onEditar = onEditar,
-                onSolicitarEliminar = { mostrarDialogoEliminar = true }
+                onSolicitarEliminar = { mostrarDialogoEliminar = true },
+                onMarcarEntregada = {
+                    tareaViewModel.marcarComoEntregada(tareaConMateria.tarea)
+                    onVolver() // Volver a la lista después de marcar como entregada
+                }
             )
         }
     }
@@ -160,10 +173,10 @@ private fun DetalleContenido(
     modifier: Modifier = Modifier,
     item: TareaConMateria,
     onEditar: () -> Unit,
-    onSolicitarEliminar: () -> Unit
+    onSolicitarEliminar: () -> Unit,
+    onMarcarEntregada: () -> Unit
 ) {
-    val formato = remember { SimpleDateFormat("EEEE d 'de' MMMM, yyyy", Locale("es", "NI")) }
-    val colorMateria = parsearColor(item.materia.colorHex)
+    val colorMateria = remember(item.materia.colorHex) { parsearColor(item.materia.colorHex) }
 
     Column(
         modifier = modifier.fillMaxSize(),
@@ -240,7 +253,7 @@ private fun DetalleContenido(
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
                 Text(
-                    text = formato.format(Date(item.tarea.fechaEntrega))
+                    text = DateFormatterUtil.format(item.tarea.fechaEntrega, FormatStyle.LONG)
                         .replaceFirstChar { it.uppercase(Locale("es", "NI")) },
                     style = MaterialTheme.typography.bodyLarge
                 )
@@ -263,6 +276,21 @@ private fun DetalleContenido(
         Spacer(modifier = Modifier.height(16.dp))
 
         // Acciones
+        if (item.tarea.estado != ni.edu.uam.uamtasks.data.model.EstadoTarea.ENTREGADA) {
+            Button(
+                onClick = onMarcarEntregada,
+                modifier = Modifier.fillMaxWidth(),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.tertiary,
+                    contentColor = MaterialTheme.colorScheme.onTertiary
+                )
+            ) {
+                Icon(Icons.Filled.CheckCircle, contentDescription = null)
+                Spacer(modifier = Modifier.size(8.dp))
+                Text("Marcar como entregada")
+            }
+        }
+
         Button(
             onClick = onEditar,
             modifier = Modifier.fillMaxWidth()

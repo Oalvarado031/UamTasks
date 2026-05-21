@@ -1,5 +1,6 @@
 package ni.edu.uam.uamtasks.ui.screens.tareas
 
+import android.R.attr.timeZone
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -35,8 +36,9 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.material3.Surface
+import androidx.compose.ui.unit.sp
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -55,6 +57,8 @@ import ni.edu.uam.uamtasks.data.model.Prioridad
 import ni.edu.uam.uamtasks.data.model.Tarea
 import ni.edu.uam.uamtasks.viewmodel.MateriaViewModel
 import ni.edu.uam.uamtasks.viewmodel.TareaViewModel
+import ni.edu.uam.uamtasks.ui.utils.DateFormatterUtil
+import ni.edu.uam.uamtasks.ui.utils.FormatStyle
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -106,27 +110,30 @@ fun TareaFormScreen(
 
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = {
-                    Text(
-                        if (esEdicion) "Editar tarea" else "Nueva tarea",
-                        fontWeight = FontWeight.Bold
-                    )
-                },
-                navigationIcon = {
+            Surface(
+                color = MaterialTheme.colorScheme.primary,
+                contentColor = MaterialTheme.colorScheme.onPrimary,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Row(
+                    modifier = Modifier
+                        .statusBarsPadding()
+                        .padding(horizontal = 4.dp, vertical = 4.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
                     IconButton(onClick = onCancelar) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = "Cancelar"
                         )
                     }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primary,
-                    titleContentColor = MaterialTheme.colorScheme.onPrimary,
-                    navigationIconContentColor = MaterialTheme.colorScheme.onPrimary
-                )
-            )
+                    Text(
+                        text = if (esEdicion) "Editar tarea" else "Nueva tarea",
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+            }
         }
     ) { padding ->
         Column(
@@ -384,6 +391,7 @@ private fun FechaSelectorCard(
     val formato = remember {
         SimpleDateFormat("EEEE d 'de' MMMM, yyyy", Locale("es", "NI")).apply {
             timeZone = java.util.TimeZone.getTimeZone("UTC")
+
         }
     }
 
@@ -415,7 +423,7 @@ private fun FechaSelectorCard(
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
                 Text(
-                    text = formato.format(Date(fechaMs))
+                    text = DateFormatterUtil.format(fechaMs, FormatStyle.LONG)
                         .replaceFirstChar { it.uppercase(Locale("es", "NI")) },
                     style = MaterialTheme.typography.bodyLarge
                 )

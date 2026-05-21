@@ -15,11 +15,13 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CalendarToday
+import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -29,18 +31,21 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import ni.edu.uam.uamtasks.data.model.TareaConMateria
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
+import ni.edu.uam.uamtasks.ui.utils.DateFormatterUtil
+
+// Cache global para colores parseados
+private val colorCache = mutableMapOf<String, Color>()
 
 @Composable
 fun TareaCard(
     item: TareaConMateria,
     onClick: () -> Unit,
+    onMarcarEntregada: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val formatoFecha = remember { SimpleDateFormat("dd/MM/yyyy", Locale("es", "NI")) }
-    val colorMateria = parsearColor(item.materia.colorHex)
+    val colorMateria = remember(item.materia.colorHex) {
+        parsearColor(item.materia.colorHex)
+    }
 
     Card(
         modifier = modifier
@@ -110,16 +115,50 @@ fun TareaCard(
                     )
                     Spacer(modifier = Modifier.width(4.dp))
                     Text(
-                        text = "Entrega: ${formatoFecha.format(Date(item.tarea.fechaEntrega))}",
+                        text = "Entrega: ${DateFormatterUtil.format(item.tarea.fechaEntrega)}",
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
+                }
+            }
+
+            // Botón Entregado
+            if (item.tarea.estado != ni.edu.uam.uamtasks.data.model.EstadoTarea.ENTREGADA) {
+                Column(
+                    modifier = Modifier.align(Alignment.CenterVertically),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    TextButton(
+                        onClick = onMarcarEntregada,
+                        modifier = Modifier.padding(start = 4.dp)
+                    ) {
+                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                            Icon(
+                                imageVector = Icons.Filled.CheckCircle,
+                                contentDescription = null,
+                                modifier = Modifier.size(20.dp)
+                            )
+                            Text(
+                                text = "Entregado",
+                                style = MaterialTheme.typography.labelSmall
+                            )
+                        }
+                    }
                 }
             }
         }
     }
 }
 
-internal fun parsearColor(hex: String): Color =
-    runCatching { Color(android.graphics.Color.parseColor(hex)) }
+internal fun parsearColor(hex: String): Color {
+    // Primero buscar en cache
+    colorCache[hex]?.let { return it }
+
+    // Si no está en cache, parsear y guardar
+    val color = runCatching { Color(android.graphics.Color.parseColor(hex)) }
         .getOrDefault(Color(0xFF1A3A5C))
+
+    colorCache[hex] = color
+    return color
+}
+

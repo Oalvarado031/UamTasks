@@ -21,6 +21,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
@@ -34,12 +35,16 @@ fun MateriaCard(
     onEliminar: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val color = parsearColor(materia.colorHex)
+    val color = remember(materia.colorHex) { parsearColor(materia.colorHex) }
+
+    // Memoizar callbacks para evitar creación de lambdas nuevas
+    val memoizedOnEditar = remember { onEditar }
+    val memoizedOnEliminar = remember { onEliminar }
 
     Card(
         modifier = modifier
             .fillMaxWidth()
-            .clickable { onEditar() },
+            .clickable { memoizedOnEditar() },
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surface
@@ -80,14 +85,14 @@ fun MateriaCard(
                 )
             }
 
-            IconButton(onClick = onEditar) {
+            IconButton(onClick = memoizedOnEditar) {
                 Icon(
                     imageVector = Icons.Filled.Edit,
                     contentDescription = "Editar materia",
                     tint = MaterialTheme.colorScheme.primary
                 )
             }
-            IconButton(onClick = onEliminar) {
+            IconButton(onClick = memoizedOnEliminar) {
                 Icon(
                     imageVector = Icons.Filled.Delete,
                     contentDescription = "Eliminar materia",
