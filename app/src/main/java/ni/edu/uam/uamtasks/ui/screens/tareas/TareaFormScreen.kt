@@ -381,7 +381,11 @@ private fun FechaSelectorCard(
     fechaMs: Long,
     onClick: () -> Unit
 ) {
-    val formato = remember { SimpleDateFormat("EEEE d 'de' MMMM, yyyy", Locale("es", "NI")) }
+    val formato = remember {
+        SimpleDateFormat("EEEE d 'de' MMMM, yyyy", Locale("es", "NI")).apply {
+            timeZone = java.util.TimeZone.getTimeZone("UTC")
+        }
+    }
 
     Card(
         modifier = Modifier
