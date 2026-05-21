@@ -1,11 +1,21 @@
 package ni.edu.uam.uamtasks.ui.screens.materias
 
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.School
@@ -17,17 +27,22 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import ni.edu.uam.uamtasks.R
 import ni.edu.uam.uamtasks.data.model.Materia
 import ni.edu.uam.uamtasks.ui.components.EmptyState
 import ni.edu.uam.uamtasks.ui.components.MateriaCard
@@ -43,19 +58,40 @@ fun MateriasListScreen(
     val materias by materiaViewModel.materias.collectAsStateWithLifecycle()
     var materiaAEliminar by remember { mutableStateOf<Materia?>(null) }
 
+    // Memoizar callbacks
+    val handleAgregarMateria = remember { onAgregarMateria }
+    val handleEditarMateria = remember { onEditarMateria }
+
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = { Text("Materias", fontWeight = FontWeight.Bold) },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primary,
-                    titleContentColor = MaterialTheme.colorScheme.onPrimary
-                )
-            )
+            Surface(
+                color = MaterialTheme.colorScheme.primary,
+                contentColor = MaterialTheme.colorScheme.onPrimary,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Row(
+                    modifier = Modifier
+                        .statusBarsPadding()
+                        .padding(horizontal = 16.dp, vertical = 8.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Image(
+                        painter = painterResource(id = R.drawable.uam_logo),
+                        contentDescription = null,
+                        modifier = Modifier.size(24.dp)
+                    )
+                    Spacer(modifier = Modifier.width(12.dp))
+                    Text(
+                        text = "Materias",
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+            }
         },
         floatingActionButton = {
             FloatingActionButton(
-                onClick = onAgregarMateria,
+                onClick = handleAgregarMateria,
                 containerColor = MaterialTheme.colorScheme.primary
             ) {
                 Icon(
@@ -88,7 +124,7 @@ fun MateriasListScreen(
                 items(materias, key = { it.id }) { materia ->
                     MateriaCard(
                         materia = materia,
-                        onEditar = { onEditarMateria(materia.id) },
+                        onEditar = { handleEditarMateria(materia.id) },
                         onEliminar = { materiaAEliminar = materia }
                     )
                 }
